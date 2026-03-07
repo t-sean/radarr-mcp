@@ -74,7 +74,7 @@ export RADARR_API_KEY=your_api_key_here
 export RADARR_URL=http://localhost:7878
 
 # Run the server
-python main.py
+uv run main.py
 ```
 
 ## Available Tools

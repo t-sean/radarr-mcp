@@ -15,6 +15,12 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
+for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+    logger = logging.getLogger(logger_name)
+    logger.handlers.clear()
+    logger.propagate = True
+    logger.setLevel(logging.DEBUG)
+
 if not RADARR_API_KEY:
     logging.error("RADARR_API_KEY environment variable is not set.")
     exit(1)
