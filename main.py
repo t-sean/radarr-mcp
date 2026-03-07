@@ -15,7 +15,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access", "fastmcp", "mcp"):
     logger = logging.getLogger(logger_name)
     logger.handlers.clear()
     logger.propagate = True
