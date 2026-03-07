@@ -23,8 +23,5 @@ COPY main.py tools.py ./
 # Set PATH to use venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Expose MCP server port
-EXPOSE 7979
-
 # Run the application
 CMD ["python", "main.py"]

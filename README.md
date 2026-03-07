@@ -18,6 +18,7 @@ A Model Context Protocol (MCP) server for managing Radarr via natural language i
 
 ### Optional
 - `RADARR_URL` - Radarr instance URL (default: `http://localhost:7878`)
+- `MCP_HOST` - Host to bind server to (default: `localhost`)
 - `MCP_PORT` - MCP server port (default: `7979`)
 - `LOG_LEVEL` - Logging level (default: `INFO`)
 
