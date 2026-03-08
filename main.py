@@ -6,20 +6,14 @@ from tools import lookup_movie, delete_movie_file, search_movie, get_download_qu
 RADARR_API_KEY = os.getenv("RADARR_API_KEY")
 MCP_PORT = int(os.getenv("MCP_PORT", "7979"))
 MCP_HOST = os.getenv("MCP_HOST", "localhost")
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
-level = getattr(logging, LOG_LEVEL, logging.INFO)
+logging.getLogger("uvicorn").setLevel(logging.DEBUG)
+
 logging.basicConfig(
-    level=level,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
-
-for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access", "fastmcp", "mcp"):
-    logger = logging.getLogger(logger_name)
-    logger.handlers.clear()
-    logger.propagate = True
-    logger.setLevel(logging.DEBUG)
 
 if not RADARR_API_KEY:
     logging.error("RADARR_API_KEY environment variable is not set.")

@@ -6,7 +6,7 @@ RADARR_URL = os.getenv("RADARR_URL", "http://localhost:7878")
 RADARR_API_KEY = os.getenv("RADARR_API_KEY")
 
 
-def _make_api_request(endpoint: str, method: str = "GET", **kwargs) -> dict | list:
+def _make_api_request(endpoint: str, method: str = "GET", **kwargs) -> dict:
     """Make API request with consistent error handling."""
     try:
         response = requests.request(
@@ -23,7 +23,7 @@ def _make_api_request(endpoint: str, method: str = "GET", **kwargs) -> dict | li
         
         return response.json()
     except requests.exceptions.RequestException as e:
-        error_msg = f"API request failed: {e.response.status_code} {e.response.reason}" if hasattr(e, 'response') else f"API request failed: {str(e)}"
+        error_msg = f"API request failed: {str(e)}"
         logging.error(error_msg)
         return {"error": error_msg}
 
