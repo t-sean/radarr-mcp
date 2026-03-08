@@ -14,5 +14,7 @@ Workflow for cleanup:
 
 Rules:
 - Always confirm movie ID via lookup before acting.
-- Only delete files with explicit confirmation or when clearly broken.
-- Report actions: queue items cleared, files deleted, searches triggered.
+- Files with .exe are bad downloads and should be immediately deleted from queue, blocked, and redownloaded.
+- Downloads stuck in import with not a quality upgrade should only be cleared.
+- Block downloads that repeated fail when clearing the queue.
+- Report what you did: items cleared, files deleted, searches triggered.
