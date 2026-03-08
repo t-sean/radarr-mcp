@@ -1,10 +1,12 @@
 import logging
 import requests
 import os
+from fastmcp import FastMCP
 
 RADARR_URL = os.getenv("RADARR_URL", "http://localhost:7878")
 RADARR_API_KEY = os.getenv("RADARR_API_KEY")
 
+mcp = FastMCP("radarr-mcp")
 
 def _make_api_request(endpoint: str, method: str = "GET", **kwargs) -> dict:
     """Make API request with consistent error handling."""
@@ -27,6 +29,7 @@ def _make_api_request(endpoint: str, method: str = "GET", **kwargs) -> dict:
         logging.error(error_msg)
         return {"error": error_msg}
 
+@mcp.tool()
 def lookup_movie(title: str) -> list[dict] | dict:
     """Search for a movie by title. Returns a list of candidates with key fields to help identify the correct movie, including whether it's already in the Radarr library."""
     logging.info(f"Looking up movie '{title}'...")
@@ -52,6 +55,7 @@ def lookup_movie(title: str) -> list[dict] | dict:
         for m in result[:10]
     ]
 
+@mcp.tool()
 def search_movie(radarr_id: int) -> dict:
     """Trigger a search for a movie in Radarr by its Radarr ID. This is useful for replacing movies"""
     logging.info(f"Triggering search for movie ID '{radarr_id}'...")
@@ -63,6 +67,7 @@ def search_movie(radarr_id: int) -> dict:
     logging.info(status)
     return {"status": status}
 
+@mcp.tool()
 def get_download_queue(page: int) -> dict:
     """Get the current download queue from Radarr. Use this to find broken or stalled downloads. Results are paginated."""
     logging.info("Fetching download queue...")
@@ -86,26 +91,33 @@ def get_download_queue(page: int) -> dict:
         ],
     }
 
-def delete_queue_item(queue_id: int) -> dict:
-    """Delete an item from the Radarr download queue by its Queue ID."""
-    logging.info(f"Deleting queue item ID '{queue_id}'...")
-    status = _make_api_request(f"queue/{queue_id}", method="DELETE",
-        params={"removeFromClient": True, "blocklist": True}
-        )
-    return status
+@mcp.tool()
+def clear_download_queue_items(queue_ids: list[int], blocklist: bool = False, skipRedownload: bool = False) -> dict:
+    """"Remove items from the download queue by their queue IDs. Optionally block the items and/or skip redownload."""
+    logging.info(f"Deleting queue item ID '{queue_ids}'...")
+    response = _make_api_request(f"queue", method="DELETE", json={
+        "ids": queue_ids,
+        "blocklist": blocklist,
+        "skipRedownload": skipRedownload,
+        "removeFromClient": True
+    })
+    return response
 
+@mcp.tool()
 def lookup_movie_file(moviefile_id: int) -> dict:
     """Lookup a MovieFile in Radarr by its MovieFile ID."""
     logging.info(f"Looking up MovieFile ID '{moviefile_id}'...")
     moviefile = _make_api_request(f"moviefile/{moviefile_id}")
     return moviefile
 
+@mcp.tool()
 def delete_movie_file(moviefile_id: int) -> dict:
     """Delete a MovieFile from Radarr by its MovieFile ID."""
     logging.info(f"Deleting MovieFile ID '{moviefile_id}'...")
     status = _make_api_request(f"moviefile/{moviefile_id}",method="DELETE")
     return status
 
+@mcp.tool()
 def get_quality_profiles() -> list[dict]:
     """Get all quality profiles from Radarr."""
     logging.info("Fetching quality profiles...")
@@ -120,6 +132,7 @@ def get_quality_profiles() -> list[dict]:
         for p in profiles
     ]
 
+@mcp.tool()
 def update_movie_quality(radarr_id: int, quality_profile_id: int) -> dict:
     """Update the quality profile of a movie in Radarr."""
     logging.info(f"Updating quality profile for movie ID '{radarr_id}' to profile ID '{quality_profile_id}'...")
