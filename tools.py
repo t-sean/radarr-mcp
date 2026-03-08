@@ -95,8 +95,7 @@ def get_download_queue(page: int) -> dict:
 def clear_download_queue_items(queue_ids: list[int], blocklist: bool = False, skipRedownload: bool = False) -> dict:
     """"Remove items from the download queue by their queue IDs. Optionally block the items and/or skip redownload."""
     logging.info(f"Deleting queue item ID '{queue_ids}'...")
-    response = _make_api_request(f"queue", method="DELETE", json={
-        "ids": queue_ids,
+    response = _make_api_request(f"queue", method="DELETE", json={"ids": queue_ids}, params={
         "blocklist": blocklist,
         "skipRedownload": skipRedownload,
         "removeFromClient": True
