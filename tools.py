@@ -63,23 +63,28 @@ def search_movie(radarr_id: int) -> dict:
     logging.info(status)
     return {"status": status}
 
-def get_download_queue() -> list[dict]:
-    """Get the current download queue from Radarr. Use this to find broken or stalled downloads."""
+def get_download_queue(page: int) -> dict:
+    """Get the current download queue from Radarr. Use this to find broken or stalled downloads. Results are paginated."""
     logging.info("Fetching download queue...")
-    queue = _make_api_request("queue")
+    queue = _make_api_request("queue", params={"page": page})
     records = queue.get("records", [])
     logging.info(f"Found {len(records)} item(s) in the download queue.")
-    return [
-        {
-            "queueId": r.get("id"),
-            "movieId": r.get("movieId"),
-            "title": r.get("title"),
-            "status": r.get("status"),
-            "trackedDownloadStatus": r.get("trackedDownloadStatus"),
-            "errorMessage": r.get("errorMessage"),
-        }
-        for r in records
-    ]
+    return {
+        "page": queue.get("page"),
+        "pageSize": queue.get("pageSize"),
+        "totalRecords": queue.get("totalRecords"),
+        "records": [
+            {
+                "queueId": r.get("id"),
+                "movieId": r.get("movieId"),
+                "title": r.get("title"),
+                "status": r.get("status"),
+                "trackedDownloadStatus": r.get("trackedDownloadStatus"),
+                "errorMessage": r.get("errorMessage"),
+            }
+            for r in records
+        ],
+    }
 
 def delete_queue_item(queue_id: int) -> dict:
     """Delete an item from the Radarr download queue by its Queue ID."""
