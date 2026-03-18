@@ -107,7 +107,15 @@ def lookup_movie_file(moviefile_id: int) -> dict:
     """Lookup a MovieFile in Radarr by its MovieFile ID."""
     logging.info(f"Looking up MovieFile ID '{moviefile_id}'...")
     moviefile = _make_api_request(f"moviefile/{moviefile_id}")
-    return moviefile
+    quality_obj = moviefile.get("quality", {})
+    quality_name = quality_obj.get("quality", {}).get("name") if isinstance(quality_obj, dict) else None
+    return {
+        "movieFileId": moviefile.get("id"),
+        "movieId": moviefile.get("movieId"),
+        "quality": quality_name,
+        "dateAdded": moviefile.get("dateAdded"),
+        "qualityCutoffNotMet": moviefile.get("qualityCutoffNotMet", False),
+    }
 
 @mcp.tool()
 def delete_movie_file(moviefile_id: int) -> dict:
